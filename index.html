@@ -580,6 +580,10 @@
       <h3>Umumiy ko'rsatkichlar</h3>
       <div class="stat-cards" id="statCards"></div>
       <div class="bar-block">
+        <h4>Ijtimoiy tarmoqlar</h4>
+        <div class="stat-cards" id="socialStatCards"></div>
+      </div>
+      <div class="bar-block">
         <h4>Guruhlar bo'yicha</h4>
         <div id="barGuruh"></div>
       </div>
@@ -682,6 +686,20 @@ function applySocials(socials){
     if(url){ document.getElementById(id).href = url; }
   });
 }
+/* Ijtimoiy tarmoq havolasi bosilganda backendga hisoblash uchun signal yuboradi (yangi oyna ochilishiga xalaqit bermaydi) */
+(function wireSocialClickTracking(){
+  const typeMap = { socTelegram:'telegram', socInstagram:'instagram', socYoutube:'youtube' };
+  Object.keys(typeMap).forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('click', () => {
+      if(DEMO_MODE) return;
+      try{
+        fetch(SCRIPT_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({ action:'trackClick', type: typeMap[id] }) });
+      } catch(err){ /* jim */ }
+    });
+  });
+})();
 async function loadPublicConfig(){
   if(DEMO_MODE){ populateGuruhSelect(DEFAULT_GURUHLAR); return; }
   try{
@@ -973,12 +991,27 @@ function renderDashboard(data){
     <div class="stat-card"><div class="num">${Object.keys(data.byGuruh||{}).length}</div><div class="lbl">Faol guruhlar</div></div>
     <div class="stat-card"><div class="num">${Object.keys(data.byReklama||{}).length}</div><div class="lbl">Reklama manbalari</div></div>
   `;
+  renderSocialStats(data.socialStats);
   renderBars('barGuruh', data.byGuruh, data.total);
   renderDonut('barReklama', data.byReklama, data.total);
 
   renderStudentsTable(currentStudents);
 
   populateSettingsForm(data.guruhlar, data.socials);
+}
+function renderSocialStats(social){
+  const el = document.getElementById('socialStatCards');
+  social = social || {};
+  const clicks = social.clicks || {};
+  const items = [
+    { label:'Telegram bosilgan', val: clicks.telegram || 0 },
+    { label:'Instagram bosilgan', val: clicks.instagram || 0 },
+    { label:'YouTube bosilgan', val: clicks.youtube || 0 }
+  ];
+  if(social.telegramMembers !== null && social.telegramMembers !== undefined){
+    items.push({ label:"Telegram kanal a'zolari", val: social.telegramMembers });
+  }
+  el.innerHTML = items.map(i => `<div class="stat-card"><div class="num">${i.val}</div><div class="lbl">${escapeHtml(i.label)}</div></div>`).join('');
 }
 function renderBars(containerId, obj, total){
   const el = document.getElementById(containerId);
