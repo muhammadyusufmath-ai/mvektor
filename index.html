@@ -83,15 +83,7 @@
   .logo-wrap{ width:50px; height:68px; perspective:600px; }
   .logo-mark{
     width:100%; height:100%; display:block; object-fit:contain;
-    transform-style:preserve-3d; animation:logoFloat 6s ease-in-out infinite;
     filter:drop-shadow(0 6px 14px rgba(28,217,74,0.35));
-  }
-  @keyframes logoFloat{
-    0%{transform:rotateX(8deg) rotateY(-14deg) translateY(0);}
-    25%{transform:rotateX(-6deg) rotateY(10deg) translateY(-4px);}
-    50%{transform:rotateX(10deg) rotateY(16deg) translateY(2px);}
-    75%{transform:rotateX(-8deg) rotateY(-12deg) translateY(-3px);}
-    100%{transform:rotateX(8deg) rotateY(-14deg) translateY(0);}
   }
   .brand-name{ font-family:var(--font-display); font-weight:700; font-size:19px; letter-spacing:0.01em; line-height:1.1;}
   .brand-name span{ display:block; font-family:var(--font-body); font-weight:500; font-size:11.5px; color:var(--chalk-dim); letter-spacing:0.02em; margin-top:2px;}
@@ -203,6 +195,19 @@
   .cal-day.muted{ color:#C9C2AC; }
   .cal-day.selected{ background:var(--green-mid); color:#fff; font-weight:600; }
   .cal-day.today{ box-shadow:inset 0 0 0 1.5px var(--green-mid); }
+
+  .mfy-pop{ width:100%; max-height:320px; overflow:hidden; display:none; flex-direction:column; }
+  .mfy-pop.open{ display:flex; }
+  .mfy-search-input{
+    width:100%; padding:10px 12px; border-radius:9px; border:1.5px solid #E2DCC7; background:#FAF8EF;
+    color:var(--ink); font-size:14px; outline:none; margin-bottom:8px; flex-shrink:0; font-family:var(--font-body);
+  }
+  .mfy-search-input:focus{ border-color:var(--green-mid); }
+  .mfy-options-list{ overflow-y:auto; max-height:230px; }
+  .mfy-option-row{ padding:9px 10px; border-radius:8px; font-size:13.5px; color:var(--ink); cursor:pointer; }
+  .mfy-option-row:hover{ background:#EFF7F0; }
+  .mfy-option-row.selected{ background:var(--green-mid); color:#fff; font-weight:600; }
+  .mfy-empty{ padding:14px 4px; font-size:13px; color:var(--ink-dim); text-align:center; }
 
   .submit-row{ margin-top:28px; display:flex; flex-direction:column; align-items:center; gap:10px; }
   .btn-submit{
@@ -340,6 +345,14 @@
   .phone-link:hover{ color:var(--green-mid); }
 
   .settings-block{ margin-bottom:28px; }
+  .admin-address-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:22px; max-width:560px; }
+  @media (max-width:600px){ .admin-address-row{ grid-template-columns:1fr; } }
+  .admin-address-row .mini-field{ display:flex; flex-direction:column; gap:6px; }
+  .admin-address-row label{ font-size:12.5px; color:var(--ink-dim); font-weight:600; }
+  .admin-address-row select{
+    padding:10px 12px; border-radius:9px; border:1.5px solid #D4C9A4; font-size:14px; background:#fff; color:var(--ink);
+    font-family:var(--font-body);
+  }
   .settings-block h4{ font-size:14.5px; margin-bottom:12px; }
   .yonalish-row{ display:flex; gap:8px; margin-bottom:8px; }
   .yonalish-row input{ flex:1; padding:10px 12px; border-radius:9px; border:1.5px solid #D4C9A4; font-size:14px; outline:none; }
@@ -429,27 +442,49 @@
           <div class="select-wrap">
             <select id="sinf" name="sinf">
               <option value="" disabled selected hidden>Tanlang</option>
-              <optgroup label="Maktab o'quvchisi">
-                <option>1-sinf</option><option>2-sinf</option><option>3-sinf</option><option>4-sinf</option>
-                <option>5-sinf</option><option>6-sinf</option><option>7-sinf</option><option>8-sinf</option>
-                <option>9-sinf</option><option>10-sinf</option><option>11-sinf</option>
-              </optgroup>
-              <optgroup label="Talaba">
-                <option>1-kurs talaba</option><option>2-kurs talaba</option><option>3-kurs talaba</option>
-                <option>4-kurs talaba</option><option>5-kurs talaba</option>
-              </optgroup>
-              <optgroup label="Boshqa"><option>O'qituvchi</option></optgroup>
+              <!-- variantlar JS orqali "Sozlamalar" varog'idan yuklanadi -->
             </select>
           </div>
           <div class="error-msg">Iltimos, tanlang.</div>
         </div>
       </div>
 
-      <div class="field-grid single" style="margin-top:18px;">
+      <div class="field-grid" style="margin-top:18px;">
         <div class="field">
-          <label for="manzil">Yashash manzili <span class="req">*</span></label>
-          <input type="text" id="manzil" name="manzil" placeholder="Viloyat, tuman/shahar, mahalla" autocomplete="address-level2">
-          <div class="error-msg">Yashash manzilingizni kiriting.</div>
+          <label for="viloyat">Viloyat <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select id="viloyat" name="viloyat">
+              <option value="" disabled selected hidden>Tanlang</option>
+            </select>
+          </div>
+          <div class="error-msg">Viloyatni tanlang.</div>
+        </div>
+        <div class="field">
+          <label for="tuman">Tuman/shahar <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select id="tuman" name="tuman" disabled>
+              <option value="" disabled selected hidden>Avval viloyatni tanlang</option>
+            </select>
+          </div>
+          <div class="error-msg">Tuman yoki shaharni tanlang.</div>
+        </div>
+      </div>
+
+      <div class="field-grid single" style="margin-top:18px;">
+        <div class="field" id="mfyField">
+          <label for="mfyText">Mahalla (MFY) <span class="req">*</span></label>
+          <input type="text" id="mfyText" name="mfyText" placeholder="Mahalla nomi" autocomplete="off">
+          <div class="date-field" id="mfySelectWrap" style="display:none;">
+            <div class="fake-input" id="mfyFakeInput" tabindex="0">
+              <span class="placeholder" id="mfyFakeText">Tanlang</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="calendar-pop mfy-pop" id="mfyPopover">
+              <input type="text" id="mfySearchInput" class="mfy-search-input" placeholder="Qidirish...">
+              <div id="mfyOptionsList" class="mfy-options-list"></div>
+            </div>
+          </div>
+          <div class="error-msg">Mahalla (MFY) nomini kiriting.</div>
         </div>
       </div>
 
@@ -481,9 +516,7 @@
           <div class="select-wrap">
             <select id="reklama" name="reklama">
               <option value="" disabled selected hidden>Tanlang</option>
-              <option>Telegram kanal va guruhlarda</option>
-              <option>Reklama flayerlarda</option>
-              <option>Do'stim va qarindoshimdan eshitdim</option>
+              <!-- variantlar JS orqali "Sozlamalar" varog'idan yuklanadi -->
             </select>
           </div>
           <div class="error-msg">Iltimos, tanlang.</div>
@@ -573,6 +606,7 @@
     <div class="admin-tabs">
       <button class="admin-tab-btn active" data-tab="analytics">Analitika</button>
       <button class="admin-tab-btn" data-tab="students">O'quvchilar</button>
+      <button class="admin-tab-btn" data-tab="mfy">Manzil (MFY)</button>
       <button class="admin-tab-btn" data-tab="settings">Sozlamalar</button>
     </div>
 
@@ -608,6 +642,30 @@
       <div class="admin-empty" id="studentsEmpty" style="display:none;">Hozircha arizalar yo'q.</div>
     </div>
 
+    <div class="admin-panel" id="panel-mfy">
+      <h3>Manzil (MFY) biriktirish</h3>
+      <p style="color:var(--ink-dim); font-size:13.5px; margin-bottom:18px; max-width:560px;">
+        Qaysi tuman uchun mahalla (MFY) ro'yxatini biriktirsangiz, ro'yxatdan o'tish formasida o'sha tuman
+        tanlanganda mahalla qidiruvli dropdown orqali tanlanadi. Biriktirilmagan tumanlarda mahalla nomi qo'lda yoziladi.
+      </p>
+      <div class="admin-address-row">
+        <div class="mini-field">
+          <label>Viloyat</label>
+          <select id="adminMfyViloyat"><option value="" disabled selected hidden>Tanlang</option></select>
+        </div>
+        <div class="mini-field">
+          <label>Tuman/shahar</label>
+          <select id="adminMfyTuman" disabled><option value="" disabled selected hidden>Avval viloyatni tanlang</option></select>
+        </div>
+      </div>
+      <div id="adminMfyListWrap" style="display:none;">
+        <h4 style="font-size:14.5px; margin-bottom:10px;">"<span id="adminMfyTumanName"></span>" tumani uchun mahallalar</h4>
+        <div id="adminMfyList"></div>
+        <button type="button" class="add-yonalish" id="addAdminMfy">+ Mahalla qo'shish</button>
+        <div><button class="save-btn" id="saveAdminMfy">Saqlash</button><span class="save-msg" id="saveAdminMfyMsg">Saqlandi ✓</span></div>
+      </div>
+    </div>
+
     <div class="admin-panel" id="panel-settings">
       <h3>Sozlamalar</h3>
 
@@ -616,6 +674,20 @@
         <div id="yonalishList"></div>
         <button type="button" class="add-yonalish" id="addYonalish">+ Yo'nalish qo'shish</button>
         <div><button class="save-btn" id="saveYonalish">Saqlash</button><span class="save-msg" id="saveYonalishMsg">Saqlandi ✓</span></div>
+      </div>
+
+      <div class="settings-block">
+        <h4>Sinf/kurs variantlari</h4>
+        <div id="sinfList"></div>
+        <button type="button" class="add-yonalish" id="addSinf">+ Variant qo'shish</button>
+        <div><button class="save-btn" id="saveSinf">Saqlash</button><span class="save-msg" id="saveSinfMsg">Saqlandi ✓</span></div>
+      </div>
+
+      <div class="settings-block">
+        <h4>"Bu reklamani qayerda ko'rdingiz?" variantlari</h4>
+        <div id="reklamaList"></div>
+        <button type="button" class="add-yonalish" id="addReklama">+ Variant qo'shish</button>
+        <div><button class="save-btn" id="saveReklama">Saqlash</button><span class="save-msg" id="saveReklamaMsg">Saqlandi ✓</span></div>
       </div>
 
       <div class="settings-block">
@@ -634,7 +706,7 @@
 /* ============================================================
    0) CONFIG
    ============================================================ */
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLOGa_CgnsLMFpqrRpQ_PnZmCAC_MHdk9DbF6fNReMIdlxuaxQQ6K1XKPy8xaber0IJQ/exec";
+const SCRIPT_URL = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
 const DEMO_MODE = SCRIPT_URL.indexOf("PASTE_YOUR") !== -1;
 const DEFAULT_GURUHLAR = [
   "Matematika - 0 dan majburiy (online)",
@@ -642,6 +714,54 @@ const DEFAULT_GURUHLAR = [
   "Matematika - milliy sertifikat (online)",
   "Matematika - milliy sertifikat (offline)"
 ];
+const DEFAULT_SINFLAR = [
+  "1-sinf","2-sinf","3-sinf","4-sinf","5-sinf","6-sinf","7-sinf","8-sinf","9-sinf","10-sinf","11-sinf",
+  "1-kurs talaba","2-kurs talaba","3-kurs talaba","4-kurs talaba","5-kurs talaba","O'qituvchi"
+];
+const DEFAULT_REKLAMA = [
+  "Telegram kanal va guruhlarda",
+  "Reklama flayerlarda",
+  "Do'stim va qarindoshimdan eshitdim"
+];
+
+/* ============================================================
+   VILOYAT -> TUMAN/SHAHAR (to'liq ro'yxat)
+   ============================================================ */
+const ADDRESS_DATA = {
+  "Qoraqalpog'iston Respublikasi": ["Nukus shahri","Amudaryo tumani","Beruniy tumani","Kegeyli tumani","Qanliko'l tumani","Qorao'zak tumani","Qo'ng'irot tumani","Mo'ynoq tumani","Nukus tumani","Taxiatosh shahri","Taxtako'pir tumani","To'rtko'l tumani","Xo'jayli tumani","Chimboy tumani","Shumanay tumani","Ellikqal'a tumani"],
+  "Andijon viloyati": ["Andijon shahri","Xonobod shahri","Andijon tumani","Asaka tumani","Baliqchi tumani","Bo'z tumani","Buloqboshi tumani","Izboskan tumani","Jalaquduq tumani","Xo'jaobod tumani","Qo'rg'ontepa tumani","Marhamat tumani","Oltinko'l tumani","Paxtaobod tumani","Shahrixon tumani","Ulug'nor tumani"],
+  "Buxoro viloyati": ["Buxoro shahri","Kogon shahri","Buxoro tumani","Vobkent tumani","Jondor tumani","Kogon tumani","Olot tumani","Peshku tumani","Romitan tumani","Shofirkon tumani","Qorako'l tumani","Qorovulbozor tumani","G'ijduvon tumani"],
+  "Farg'ona viloyati": ["Farg'ona shahri","Marg'ilon shahri","Qo'qon shahri","Quvasoy shahri","Oltiariq tumani","Bag'dod tumani","Beshariq tumani","Buvayda tumani","Dang'ara tumani","Farg'ona tumani","Furqat tumani","Qo'shtepa tumani","Quva tumani","Rishton tumani","So'x tumani","Toshloq tumani","Uchko'prik tumani","O'zbekiston tumani","Yozyovon tumani"],
+  "Jizzax viloyati": ["Jizzax shahri","Arnasoy tumani","Baxmal tumani","Do'stlik tumani","Forish tumani","G'allaorol tumani","Sharof Rashidov tumani","Mirzacho'l tumani","Paxtakor tumani","Yangiobod tumani","Zomin tumani","Zafarobod tumani","Zarbdor tumani"],
+  "Namangan viloyati": ["Namangan shahri","Chortoq tumani","Chust tumani","Kosonsoy tumani","Mingbuloq tumani","Namangan tumani","Norin tumani","Pop tumani","To'raqo'rg'on tumani","Uchqo'rg'on tumani","Uychi tumani","Yangiqo'rg'on tumani"],
+  "Navoiy viloyati": ["Navoiy shahri","Zarafshon shahri","Konimex tumani","Karmana tumani","Qiziltepa tumani","Xatirchi tumani","Navbahor tumani","Nurota tumani","Tomdi tumani","Uchquduq tumani","Navoiy tumani"],
+  "Qashqadaryo viloyati": ["Qarshi shahri","Shahrisabz shahri","Chiroqchi tumani","Dehqonobod tumani","G'uzor tumani","Qamashi tumani","Qarshi tumani","Koson tumani","Kasbi tumani","Kitob tumani","Mirishkor tumani","Muborak tumani","Nishon tumani","Shahrisabz tumani","Yakkabog' tumani"],
+  "Samarqand viloyati": ["Samarqand shahri","Kattaqo'rg'on shahri","Bulung'ur tumani","Ishtixon tumani","Jomboy tumani","Kattaqo'rg'on tumani","Qo'shrabot tumani","Narpay tumani","Nurobod tumani","Oqdaryo tumani","Paxtachi tumani","Payariq tumani","Pastdarg'om tumani","Samarqand tumani","Toyloq tumani","Urgut tumani"],
+  "Sirdaryo viloyati": ["Guliston shahri","Oqoltin tumani","Boyovut tumani","Guliston tumani","Xovos tumani","Mirzaobod tumani","Sayxunobod tumani","Sardoba tumani","Sirdaryo tumani"],
+  "Surxondaryo viloyati": ["Termiz shahri","Angor tumani","Boysun tumani","Denov tumani","Jarqo'rg'on tumani","Qiziriq tumani","Qumqo'rg'on tumani","Muzrabot tumani","Oltinsoy tumani","Sariosiyo tumani","Sherobod tumani","Sho'rchi tumani","Termiz tumani","Uzun tumani"],
+  "Toshkent viloyati": ["Chirchiq shahri","Angren shahri","Olmaliq shahri","Bekobod shahri","Yangiyo'l shahri","Nurafshon shahri","Bekobod tumani","Bo'stonliq tumani","Bo'ka tumani","Chinoz tumani","Qibray tumani","Ohangaron tumani","Oqqo'rg'on tumani","Parkent tumani","Piskent tumani","Quyi Chirchiq tumani","O'rta Chirchiq tumani","Yangiyo'l tumani","Yuqori Chirchiq tumani","Zangiota tumani"],
+  "Toshkent shahri": ["Bektemir tumani","Chilonzor tumani","Yashnobod tumani","Mirobod tumani","Mirzo Ulug'bek tumani","Sergeli tumani","Shayxontohur tumani","Olmazor tumani","Uchtepa tumani","Yakkasaroy tumani","Yunusobod tumani","Yangihayot tumani"],
+  "Xorazm viloyati": ["Urganch shahri","Xiva shahri","Bog'ot tumani","Gurlan tumani","Xonqa tumani","Hazorasp tumani","Xiva tumani","Qo'shko'pir tumani","Shovot tumani","Urganch tumani","Yangiariq tumani","Yangibozor tumani","Tuproqqal'a tumani"]
+};
+
+/* MFY (mahalla) ro'yxati — tuman nomi bo'yicha. Backend ulangach, admin panel orqali
+   boshqarilgan haqiqiy ro'yxat (data.mfyMap) shu obyektni to'liq almashtiradi. */
+const DEFAULT_MFY_MAP = {
+  "O'zbekiston tumani": [
+    "Beruniy MFY","Eski Yaypan MFY","Bozor Yaypan MFY","Turkiston MFY","Yaypan Guzar MFY","Daxana Qaqir MFY","Islom MFY",
+    "Katta Tagob MFY","Kichik Tagob MFY","Qulibek MFY","Kul Elash MFY","Qumbosti MFY","Oxta Tagob MFY","Rajabgardi MFY",
+    "Yakkatut MFY","Sulaymon MFY","Qoratepa MFY","Davlatbotir MFY","Sochtepa MFY","Olmazor MFY","Nurli Kelajak MFY",
+    "Qorayozbobo MFY","Beshkapa MFY","Qayquobod MFY","Tuyul MFY","Namuna MFY","Elchi MFY","Dasht Xasan MFY",
+    "Darveshobod MFY","Haydarobod MFY","Shodlik MFY","Naymansoy MFY","Qaynarbuloq MFY","Taraqqiyot MFY","Ziyo Nursux MFY",
+    "Zinasha MFY","Xotamtoy MFY","Jonobod MFY","Obod Qishloq MFY","Yangi-Hayot MFY","O'qchi MFY","Dexqonobod MFY",
+    "Sho'r Qishloq MFY","Karimobod MFY","Avg'on MFY","Katta Qaynar MFY","Do'stlik MFY","Buzuqo'rg'on MFY","Qo'rg'oncha MFY",
+    "Pastki Qo'riq MFY","Mevazor MFY","Tinchlik MFY","Farovon Kelajak MFY","Qudash MFY","Qirqketmon MFY","O'qchi-Dasht MFY",
+    "Bog'i Eram MFY","O'qchi-Tuman MFY","Shakar Obod MFY","Bo'ston MFY","Qushqo'noq MFY","Qudashobod MFY","Begobod MFY",
+    "Dasht Cho'lpon MFY","Abduraxmon Jomiy MFY","Uchbo'lak MFY","Oq Tepa MFY","Sho'rsuv MFY","Kichik Oqmachit MFY",
+    "Do'ngsaroy MFY","Nursux MFY","Qaynar MFY","Oqmachit MFY"
+  ]
+};
+let MFY_MAP = DEFAULT_MFY_MAP;
 
 
 
@@ -669,15 +789,108 @@ const DEFAULT_GURUHLAR = [
 })();
 
 /* ============================================================
-   2) OMMAVIY SOZLAMALARNI YUKLASH (yo'nalishlar + ijtimoiy tarmoqlar)
+   1.5) VILOYAT / TUMAN / MFY KASKAD DROPDOWNI (qidiruvli)
    ============================================================ */
-function populateGuruhSelect(list){
-  const sel = document.getElementById('guruh');
-  sel.querySelectorAll('option:not([value=""])').forEach(o => o.remove());
-  (list && list.length ? list : DEFAULT_GURUHLAR).forEach(name => {
-    const o = document.createElement('option'); o.textContent = name; sel.appendChild(o);
+const viloyatSelect = document.getElementById('viloyat');
+const tumanSelect = document.getElementById('tuman');
+const mfyText = document.getElementById('mfyText');
+const mfySelectWrap = document.getElementById('mfySelectWrap');
+const mfyFakeInput = document.getElementById('mfyFakeInput');
+const mfyFakeText = document.getElementById('mfyFakeText');
+const mfyPopover = document.getElementById('mfyPopover');
+const mfySearchInput = document.getElementById('mfySearchInput');
+const mfyOptionsList = document.getElementById('mfyOptionsList');
+let currentMfyList = [];
+let mfySelectedValue = '';
+
+Object.keys(ADDRESS_DATA).forEach(v => {
+  const o = document.createElement('option'); o.textContent = v; viloyatSelect.appendChild(o);
+});
+
+function renderMfyOptions(list){
+  mfyOptionsList.innerHTML = '';
+  if(!list.length){ mfyOptionsList.innerHTML = '<div class="mfy-empty">Topilmadi</div>'; return; }
+  list.forEach(name => {
+    const row = document.createElement('div');
+    row.className = 'mfy-option-row' + (name === mfySelectedValue ? ' selected' : '');
+    row.textContent = name;
+    row.addEventListener('click', () => {
+      mfySelectedValue = name;
+      mfyFakeText.textContent = name;
+      mfyFakeText.classList.remove('placeholder');
+      closeMfyPopover();
+      clearError(document.getElementById('mfyField'));
+    });
+    mfyOptionsList.appendChild(row);
   });
 }
+function openMfyPopover(){
+  mfyPopover.classList.add('open');
+  mfySearchInput.value = '';
+  renderMfyOptions(currentMfyList);
+  mfySearchInput.focus();
+}
+function closeMfyPopover(){ mfyPopover.classList.remove('open'); }
+mfySearchInput.addEventListener('input', () => {
+  const q = mfySearchInput.value.trim().toLowerCase();
+  renderMfyOptions(!q ? currentMfyList : currentMfyList.filter(n => n.toLowerCase().includes(q)));
+});
+mfyFakeInput.addEventListener('click', (e) => { e.stopPropagation(); mfyPopover.classList.contains('open') ? closeMfyPopover() : openMfyPopover(); });
+mfyFakeInput.addEventListener('keydown', (e) => { if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openMfyPopover(); } });
+document.addEventListener('click', (e) => { if(!mfyPopover.contains(e.target) && e.target !== mfyFakeInput && !mfyFakeInput.contains(e.target)) closeMfyPopover(); });
+
+function resetMfyToText(){
+  mfySelectWrap.style.display = 'none';
+  mfyText.style.display = '';
+  mfyText.value = '';
+  mfySelectedValue = '';
+  currentMfyList = [];
+  closeMfyPopover();
+}
+
+viloyatSelect.addEventListener('change', () => {
+  const v = viloyatSelect.value;
+  tumanSelect.innerHTML = '<option value="" disabled selected hidden>Tanlang</option>';
+  tumanSelect.disabled = false;
+  (ADDRESS_DATA[v] || []).forEach(t => {
+    const o = document.createElement('option'); o.textContent = t; tumanSelect.appendChild(o);
+  });
+  resetMfyToText();
+  clearError(viloyatSelect);
+});
+
+tumanSelect.addEventListener('change', () => {
+  const t = tumanSelect.value;
+  const list = MFY_MAP[t];
+  if(list && list.length){
+    mfySelectWrap.style.display = '';
+    mfyText.style.display = 'none';
+    currentMfyList = list;
+    mfySelectedValue = '';
+    mfyFakeText.textContent = 'Tanlang';
+    mfyFakeText.classList.add('placeholder');
+    closeMfyPopover();
+  } else {
+    resetMfyToText();
+  }
+  clearError(tumanSelect);
+});
+function getMfyValue(){
+  return mfySelectWrap.style.display === 'none' ? mfyText.value.trim() : mfySelectedValue;
+}
+
+/* ============================================================
+   2) OMMAVIY SOZLAMALARNI YUKLASH (yo'nalishlar, sinf, reklama, ijtimoiy tarmoqlar)
+   ============================================================ */
+function populateSelectOptions(selectEl, list, fallback){
+  selectEl.querySelectorAll('option:not([value=""])').forEach(o => o.remove());
+  (list && list.length ? list : fallback).forEach(name => {
+    const o = document.createElement('option'); o.textContent = name; selectEl.appendChild(o);
+  });
+}
+function populateGuruhSelect(list){ populateSelectOptions(document.getElementById('guruh'), list, DEFAULT_GURUHLAR); }
+function populateSinfSelect(list){ populateSelectOptions(document.getElementById('sinf'), list, DEFAULT_SINFLAR); }
+function populateReklamaSelect(list){ populateSelectOptions(document.getElementById('reklama'), list, DEFAULT_REKLAMA); }
 function applySocials(socials){
   socials = socials || {};
   const map = { socTelegram:'telegram', socInstagram:'instagram', socYoutube:'youtube' };
@@ -701,14 +914,17 @@ function applySocials(socials){
   });
 })();
 async function loadPublicConfig(){
-  if(DEMO_MODE){ populateGuruhSelect(DEFAULT_GURUHLAR); return; }
+  if(DEMO_MODE){ populateGuruhSelect(DEFAULT_GURUHLAR); populateSinfSelect(DEFAULT_SINFLAR); populateReklamaSelect(DEFAULT_REKLAMA); MFY_MAP = DEFAULT_MFY_MAP; return; }
   try{
     const res = await fetch(SCRIPT_URL + '?action=public');
     const data = await res.json();
     populateGuruhSelect(data.guruhlar);
+    populateSinfSelect(data.sinf);
+    populateReklamaSelect(data.reklama);
     applySocials(data.socials);
+    MFY_MAP = (data.mfyMap && Object.keys(data.mfyMap).length) ? data.mfyMap : DEFAULT_MFY_MAP;
   } catch(err){
-    populateGuruhSelect(DEFAULT_GURUHLAR);
+    populateGuruhSelect(DEFAULT_GURUHLAR); populateSinfSelect(DEFAULT_SINFLAR); populateReklamaSelect(DEFAULT_REKLAMA); MFY_MAP = DEFAULT_MFY_MAP;
   }
 }
 loadPublicConfig();
@@ -808,8 +1024,9 @@ document.addEventListener('click', (e) => { if(!calendarPop.contains(e.target) &
 function fieldWrap(el){ return el.closest('.field'); }
 function showError(el){ const wrap = fieldWrap(el) || el.parentElement; el.classList.add('invalid'); const msg = wrap.querySelector('.error-msg'); if(msg) msg.classList.add('show'); }
 function clearError(el){ const wrap = fieldWrap(el) || el.parentElement; el.classList.remove('invalid'); const msg = wrap.querySelector('.error-msg'); if(msg) msg.classList.remove('show'); }
-['ism','familiya','manzil'].forEach(id=>{ document.getElementById(id).addEventListener('input', e => clearError(e.target)); });
-['sinf','guruh','reklama'].forEach(id=>{ document.getElementById(id).addEventListener('change', e => clearError(e.target)); });
+['ism','familiya'].forEach(id=>{ document.getElementById(id).addEventListener('input', e => clearError(e.target)); });
+['sinf','guruh','reklama','viloyat','tuman'].forEach(id=>{ document.getElementById(id).addEventListener('change', e => clearError(e.target)); });
+mfyText.addEventListener('input', () => clearError(document.getElementById('mfyField')));
 
 function toTitleCase(str){
   return str.split(/\s+/).filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
@@ -829,24 +1046,30 @@ let pendingPayload = null;
 form.addEventListener('submit', (e) => {
   e.preventDefault();
   formFatal.classList.remove('show');
-  const ism = document.getElementById('ism'), familiya = document.getElementById('familiya'), manzil = document.getElementById('manzil');
+  const ism = document.getElementById('ism'), familiya = document.getElementById('familiya');
   const sinf = document.getElementById('sinf'), guruh = document.getElementById('guruh'), reklama = document.getElementById('reklama');
+  const mfyFieldWrap = document.getElementById('mfyField');
+  const mfyValue = getMfyValue();
 
   let valid = true;
   if(!ism.value.trim()){ showError(ism); valid = false; }
   if(!familiya.value.trim()){ showError(familiya); valid = false; }
   if(!sanaHidden.value){ showError(sanaDisplay); valid = false; }
   if(!sinf.value){ showError(sinf); valid = false; }
-  if(!manzil.value.trim()){ showError(manzil); valid = false; }
+  if(!viloyatSelect.value){ showError(viloyatSelect); valid = false; }
+  if(!tumanSelect.value){ showError(tumanSelect); valid = false; }
+  if(!mfyValue){ showError(mfySelectWrap.style.display === 'none' ? mfyText : mfyFakeInput); valid = false; }
   if(!guruh.value){ showError(guruh); valid = false; }
   if(!phoneIsValid()){ showError(phoneRow); valid = false; }
   if(!reklama.value){ showError(reklama); valid = false; }
   if(!valid) return;
 
+  const manzil = `${viloyatSelect.value}, ${tumanSelect.value}, ${mfyValue}`;
+
   pendingPayload = {
     action: 'register',
     ism: ism.value.trim(), familiya: familiya.value.trim(),
-    tugilganSana: sanaHidden.value, sinf: sinf.value, manzil: manzil.value.trim(),
+    tugilganSana: sanaHidden.value, sinf: sinf.value, manzil: manzil,
     guruh: guruh.value, telefon: '+998 ' + phoneInput.value.trim(), reklama: reklama.value,
     overwrite: false
   };
@@ -898,6 +1121,9 @@ document.getElementById('resendLink').addEventListener('click', () => {
   form.reset(); form.style.display = '';
   sanaHidden.value = ''; sanaText.textContent = 'kun.oy.yil'; sanaText.classList.add('placeholder');
   selectedDate = null; phoneInput.value = '';
+  tumanSelect.innerHTML = '<option value="" disabled selected hidden>Avval viloyatni tanlang</option>';
+  tumanSelect.disabled = true;
+  resetMfyToText();
 });
 
 /* ============================================================
@@ -997,7 +1223,9 @@ function renderDashboard(data){
 
   renderStudentsTable(currentStudents);
 
-  populateSettingsForm(data.guruhlar, data.socials);
+  populateSettingsForm(data.guruhlar, data.sinfOptions, data.reklamaOptions, data.socials);
+  currentMfyMapAdmin = data.mfyMap || {};
+  refreshAdminMfyTumanView();
 }
 function renderSocialStats(social){
   const el = document.getElementById('socialStatCards');
@@ -1080,34 +1308,105 @@ document.getElementById('studentSearch').addEventListener('input', (e) => {
 });
 function escapeHtml(v){ return String(v==null?'':v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-/* --- Settings tab: Yo'nalishlar --- */
-const yonalishList = document.getElementById('yonalishList');
-function populateSettingsForm(guruhlar, socials){
-  yonalishList.innerHTML = '';
-  (guruhlar && guruhlar.length ? guruhlar : DEFAULT_GURUHLAR).forEach(v => addYonalishRow(v));
+/* --- Settings tab: tahrirlanuvchi ro'yxatlar (Yo'nalishlar, Sinflar, Reklama manbalari) --- */
+function makeEditableList(containerId, addBtnId, saveBtnId, msgId, settingsField, placeholder, defaultList){
+  const container = document.getElementById(containerId);
+  function addRow(value){
+    const row = document.createElement('div');
+    row.className = 'yonalish-row';
+    row.innerHTML = `<input type="text" value="${escapeHtml(value||'')}" placeholder="${escapeHtml(placeholder)}"><button type="button" title="O'chirish">×</button>`;
+    row.querySelector('button').addEventListener('click', () => row.remove());
+    container.appendChild(row);
+  }
+  document.getElementById(addBtnId).addEventListener('click', () => addRow(''));
+  document.getElementById(saveBtnId).addEventListener('click', async () => {
+    const values = Array.from(container.querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean);
+    const msg = document.getElementById(msgId);
+    msg.classList.remove('show');
+    try{
+      const payload = { action:'updateSettings', password: sessionStorage.getItem('mvektor_admin_pw') };
+      payload[settingsField] = values;
+      const res = await callBackend(payload);
+      if(res.ok){ msg.classList.add('show'); setTimeout(()=>msg.classList.remove('show'), 2500); }
+    } catch(err){ /* jim */ }
+  });
+  return {
+    populate(list){
+      container.innerHTML = '';
+      (list && list.length ? list : defaultList).forEach(v => addRow(v));
+    }
+  };
+}
+const yonalishListCtl = makeEditableList('yonalishList','addYonalish','saveYonalish','saveYonalishMsg','guruhlar',"Yo'nalish nomi",DEFAULT_GURUHLAR);
+const sinfListCtl = makeEditableList('sinfList','addSinf','saveSinf','saveSinfMsg','sinf','Variant nomi',DEFAULT_SINFLAR);
+const reklamaListCtl = makeEditableList('reklamaList','addReklama','saveReklama','saveReklamaMsg','reklama','Variant nomi',DEFAULT_REKLAMA);
+
+/* --- "Manzil (MFY)" tab: admin Viloyat -> Tuman tanlab, o'sha tuman uchun mahalla ro'yxatini biriktiradi --- */
+let currentMfyMapAdmin = {};
+const adminMfyViloyat = document.getElementById('adminMfyViloyat');
+const adminMfyTuman = document.getElementById('adminMfyTuman');
+const adminMfyListWrap = document.getElementById('adminMfyListWrap');
+const adminMfyTumanName = document.getElementById('adminMfyTumanName');
+const adminMfyList = document.getElementById('adminMfyList');
+
+Object.keys(ADDRESS_DATA).forEach(v => {
+  const o = document.createElement('option'); o.textContent = v; adminMfyViloyat.appendChild(o);
+});
+
+adminMfyViloyat.addEventListener('change', () => {
+  const v = adminMfyViloyat.value;
+  adminMfyTuman.innerHTML = '<option value="" disabled selected hidden>Tanlang</option>';
+  adminMfyTuman.disabled = false;
+  (ADDRESS_DATA[v] || []).forEach(t => {
+    const o = document.createElement('option'); o.textContent = t; adminMfyTuman.appendChild(o);
+  });
+  adminMfyListWrap.style.display = 'none';
+});
+
+function addAdminMfyRow(value){
+  const row = document.createElement('div');
+  row.className = 'yonalish-row';
+  row.innerHTML = `<input type="text" value="${escapeHtml(value||'')}" placeholder="Mahalla nomi"><button type="button" title="O'chirish">×</button>`;
+  row.querySelector('button').addEventListener('click', () => row.remove());
+  adminMfyList.appendChild(row);
+}
+
+function refreshAdminMfyTumanView(){
+  const t = adminMfyTuman.value;
+  if(!t){ adminMfyListWrap.style.display = 'none'; return; }
+  adminMfyTumanName.textContent = t;
+  adminMfyList.innerHTML = '';
+  (currentMfyMapAdmin[t] || []).forEach(m => addAdminMfyRow(m));
+  adminMfyListWrap.style.display = '';
+}
+adminMfyTuman.addEventListener('change', refreshAdminMfyTumanView);
+
+document.getElementById('addAdminMfy').addEventListener('click', () => addAdminMfyRow(''));
+
+document.getElementById('saveAdminMfy').addEventListener('click', async () => {
+  const t = adminMfyTuman.value;
+  if(!t) return;
+  const values = Array.from(adminMfyList.querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean);
+  const msg = document.getElementById('saveAdminMfyMsg');
+  msg.classList.remove('show');
+  try{
+    const res = await callBackend({ action:'updateSettings', password: sessionStorage.getItem('mvektor_admin_pw'), mfyTuman: t, mfyList: values });
+    if(res.ok){
+      currentMfyMapAdmin[t] = values;
+      msg.classList.add('show'); setTimeout(()=>msg.classList.remove('show'), 2500);
+    }
+  } catch(err){ /* jim */ }
+});
+
+function populateSettingsForm(guruhlar, sinfOptions, reklamaOptions, socials){
+  yonalishListCtl.populate(guruhlar);
+  sinfListCtl.populate(sinfOptions);
+  reklamaListCtl.populate(reklamaOptions);
   socials = socials || {};
   document.getElementById('socialTelegram').value = socials.telegram || '';
   document.getElementById('socialInstagram').value = socials.instagram || '';
   document.getElementById('socialYoutube').value = socials.youtube || '';
 }
-function addYonalishRow(value){
-  const row = document.createElement('div');
-  row.className = 'yonalish-row';
-  row.innerHTML = `<input type="text" value="${escapeHtml(value||'')}" placeholder="Yo'nalish nomi"><button type="button" title="O'chirish">×</button>`;
-  row.querySelector('button').addEventListener('click', () => row.remove());
-  yonalishList.appendChild(row);
-}
-document.getElementById('addYonalish').addEventListener('click', () => addYonalishRow(''));
-
-document.getElementById('saveYonalish').addEventListener('click', async () => {
-  const values = Array.from(yonalishList.querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean);
-  const msg = document.getElementById('saveYonalishMsg');
-  msg.classList.remove('show');
-  try{
-    const res = await callBackend({ action:'updateSettings', password: sessionStorage.getItem('mvektor_admin_pw'), guruhlar: values });
-    if(res.ok){ msg.classList.add('show'); setTimeout(()=>msg.classList.remove('show'), 2500); }
-  } catch(err){ /* jim */ }
-});
 
 document.getElementById('saveSocials').addEventListener('click', async () => {
   const socials = {
